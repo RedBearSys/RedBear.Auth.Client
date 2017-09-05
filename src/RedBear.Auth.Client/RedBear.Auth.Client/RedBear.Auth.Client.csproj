@@ -56,6 +56,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccessToken.cs" />
+    <Compile Include="FileReader.cs" />
+    <Compile Include="HttpClient.cs" />
+    <Compile Include="IFileReader.cs" />
+    <Compile Include="IHttpClient.cs" />
+    <Compile Include="IOAuth2Client.cs" />
     <Compile Include="OAuth2Client.cs" />
     <Compile Include="OAuth2Params.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

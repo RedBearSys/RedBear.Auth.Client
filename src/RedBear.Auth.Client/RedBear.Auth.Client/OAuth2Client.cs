@@ -7,7 +7,6 @@ using Org.BouncyCastle.Security;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -17,13 +16,15 @@ using System.Threading.Tasks;
 
 namespace RedBear.Auth.Client
 {
-    public class OAuth2Client
+    public class OAuth2Client : IOAuth2Client
     {
         private readonly HttpClient _httpClient;
+        private readonly IFileReader _fileReader;
 
-        public OAuth2Client(HttpClient httpClient)
+        public OAuth2Client(HttpClient httpClient, IFileReader fileReader)
         {
             _httpClient = httpClient;
+            _fileReader = fileReader;
         }
 
         public async Task<AccessToken> GetAccessTokenAsync(OAuth2Params oauthParams)
@@ -59,14 +60,10 @@ namespace RedBear.Auth.Client
 
         private string GetJwt(OAuth2Params oauthParams)
         {
-            RSAParameters rsaParams;
-
-            using (var fileReader = File.OpenText(oauthParams.CertificateFilePath))
-            {
-                var pemReader = new PemReader(fileReader);
-                var keyPair = (AsymmetricCipherKeyPair)pemReader.ReadObject();
-                rsaParams = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters)keyPair.Private);
-            }
+            _fileReader.Open(oauthParams.CertificateFilePath);
+            var pemReader = new PemReader(_fileReader.Reader);
+            var keyPair = (AsymmetricCipherKeyPair)pemReader.ReadObject();
+            var rsaParams = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters)keyPair.Private);
 
             var rsa = new RSACryptoServiceProvider(2048);
             rsa.ImportParameters(rsaParams);
@@ -78,7 +75,6 @@ namespace RedBear.Auth.Client
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    
                     new Claim("scope", oauthParams.ScopesAsString())
                 }),
                 Issuer = oauthParams.ClientId,

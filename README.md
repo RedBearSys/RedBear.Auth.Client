@@ -56,6 +56,12 @@ Console.WriteLine($"Expires: {token.Expires}");
 Console.ReadLine();
 ```
 
-Ensure you use the details by Red Bear in the `OAuth2Params` class.
+Ensure you use the details provided by Red Bear in the `OAuth2Params` class.
 
-It goes without saying that access tokens expire! The calling code will need to manage the expiry scenario: i.e. establish that the current UTC date and time is *after* `token.Expires` and therefore a new access token must be requested.
+It goes without saying that access tokens expire! The calling code will need to manage the expiry scenario: i.e. establish that the current UTC date and time is *after* `token.Expires` and therefore request a new access token. 
+
+### Good Practice
+
+It's good practice not to wait right until the expiry date and time to request a new access token. We advise requesting a new access token a couple of minutes before the current token's expiry. This will ensure that you don't become a victim of any clock synchronisation issues between servers.
+
+Remember that if your service application is multi-threaded, several threads might need a new access token at once. Your service application should **only ever have a single access token at once**, so you may need to synchronise threads around the process of obtaining a new access token (e.g. have a singleton access token service class with a `lock` region inside).

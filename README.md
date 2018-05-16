@@ -1,3 +1,5 @@
+# **DEPRECATED: Use [RedBear.Auth.ServiceClient](https://github.com/RedBearSys/RedBear.Auth.ServiceClient) instead!**
+
 # RedBear.Auth.Client
 OAuth2 Client for use with our Auth server.
 
